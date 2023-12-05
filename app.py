@@ -17,6 +17,7 @@ else:
     # 否则使用四个斜线
     prefix = 'sqlite:////'
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'dev'
 app.config['SQLALCHEMY_DATABASE_URI'] = prefix + os.path.join(app.root_path, 'data.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # 关闭对模型修改的监控
@@ -78,6 +79,13 @@ def inject_user():
 def page_not_found(e):  # 接受异常对象作为参数
     return render_template('404.html'), 404
     # 返回模板和状态码
+@app.errorhandler(400)
+def bad_request(e):
+    return render_template('400.html'), 400
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template('500.html'), 500
 
 @app.cli.command()  # 注册为命令
 @click.option('--drop', is_flag=True, help='Create after drop.')
