@@ -1,9 +1,13 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h3>Settings</h3>
-<form method="post">
-    Your Name <input type="text" name="name" autocomplete="off" required value="{{ current_user.name }}">
-    <input class="btn" type="submit" name="submit" value="Save">
-</form>
+    <h3>Settings</h3>
+    {% if updated_name %}
+        <p>Updated Name: {{ updated_name }}</p>
+    {% endif %}
+    <form method="post">
+        Your Name <input type="text" name="name" autocomplete="off" required>
+        <input class="btn" type="submit" name="submit" value="Save">
+    </form>
 {% endblock %}
+

@@ -20,7 +20,6 @@ else:
     prefix = 'sqlite:////'
 
 
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'dev'
 app.config['SQLALCHEMY_DATABASE_URI'] = prefix + os.path.join(app.root_path, 'data.db')
@@ -226,7 +225,6 @@ def logout():
 def settings():
     if request.method == 'POST':
         name = request.form['name']
-
         if not name or len(name) > 20:
             flash('Invalid input.')
             return redirect(url_for('settings'))
@@ -235,8 +233,13 @@ def settings():
         user.name = name
         db.session.commit()
         flash('Settings updated.')
-        return redirect(url_for('index'))
 
+        # 获取更新后的用户名
+        updated_name = User.query.first().name
+
+        return render_template('settings.html', updated_name=updated_name)
+
+    # 如果是 GET 请求，显示原始表单
     return render_template('settings.html')
 
 
