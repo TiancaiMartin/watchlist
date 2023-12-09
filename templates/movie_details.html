@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Movie Details</h2>
+  <h3>{{ movie.movie_name }}</h3>
+  <p>Year: {{ movie.year }}</p>
+  <p>Release Date: {{ movie.release_date }}</p>
+  <p>Country: {{ movie.country }}</p>
+  <p>Type: {{ movie.type }}</p>
+  <!-- 显示票房信息 -->
+  <h4>Box Office</h4>
+  <p>Total Gross: {{ box_office_info.box }} 亿元</p>
+  <h4>Director</h4>
+  <ul>
+    <li>{{ director.actor_name }}</li>
+  </ul>  
+  <!-- 显示主演信息 -->
+  <h4>Cast</h4>
+  <ul>
+    {% for actor in actors %}
+      <li>{{ actor.actor_name }}</li>
+    {% endfor %}
+  </ul>
+
+  <a class="imdb" href="https://www.imdb.com/find?q={{ movie.movie_name }}" target="_blank" title="Find this movie on IMDb">IMDb</a>
+  <a class="douban" href="https://movie.douban.com/subject_search?search_text={{ movie.movie_name }}" target="_blank" title="在豆瓣上搜索该电影">豆瓣</a>
+{% endblock %}
+
