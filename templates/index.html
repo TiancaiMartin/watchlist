@@ -1,16 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
     <p>{{ movies|length }} Titles</p>
-    {% if current_user.is_authenticated %}
-        <form method="post">
-            Movie_Name <input type="text" name="movie_name" autocomplete="off" required>
-            Year <input type="text" name="year" autocomplete="off" required>
-            Country <input type="text" name="country" autocomplete="off" required>
-            Type <input type="text" name="type" autocomplete="off" required>
-            Release_date <input type="text" name="yy-mm-dd" autocomplete="off" required>
-            <input class="btn" type="submit" name="submit" value="Add">
-        </form>
-    {% endif %}
     <ul class="movie-list">
         {% for movie in movies %}
             <li>
@@ -28,5 +18,24 @@
             </li>
         {% endfor %}
     </ul>
+    {% if current_user.is_authenticated %}
+        <form method="post">
+            <div class="form-container">
+                <input class="btn" type="submit" name="submit" value="Add">
+                <label class="input-label">Movie Name</label>
+                <input class="inline-form" type="text" name="movie_name" autocomplete="off" required>
+                <label class="input-label">Year</label>
+                <input class="inline-form" type="text" name="year" autocomplete="off" required>
+                <label class="input-label">Country</label>
+                <input class="inline-form" type="text" name="country" autocomplete="off" required>
+                <label class="input-label">Type</label>
+                <input class="inline-form" type="text" name="type" autocomplete="off" required>
+                <label class="input-label">Release Date (YY-MM-DD)</label>
+                <input class="inline-form" type="text" name="yy-mm-dd" autocomplete="off" required>
+                <label class="input-label">Box</label>
+                <input class="inline-form" type="text" name="box" autocomplete="off" required>
+            </div>
+        </form>
+    {% endif %}
     <img alt="Bruh Cat" class="bruh" src="{{ url_for('static', filename='images/bruh.gif') }}" title="Bruh~">
 {% endblock %}

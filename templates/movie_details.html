@@ -21,6 +21,10 @@
       <li>{{ actor.actor_name }}</li>
     {% endfor %}
   </ul>
+  <h4>Review on Office Box</h4>
+  <ul>
+    <li>{{ box_office_info.review }}</li>
+  </ul>  
 
   <a class="imdb" href="https://www.imdb.com/find?q={{ movie.movie_name }}" target="_blank" title="Find this movie on IMDb">IMDb</a>
   <a class="douban" href="https://movie.douban.com/subject_search?search_text={{ movie.movie_name }}" target="_blank" title="在豆瓣上搜索该电影">豆瓣</a>

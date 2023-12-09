@@ -11,6 +11,7 @@ import sys
 from flask_sqlalchemy import SQLAlchemy  # 导入扩展类
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.orm.session import make_transient
+from request_gpt import generate_movie_box_office_analysis
 
 WIN = sys.platform.startswith('win')
 if WIN:
@@ -63,9 +64,7 @@ class MovieBox(db.Model):
 
     movie_id = db.Column(db.Integer, primary_key=True,autoincrement=True)
     box = db.Column(db.Float)
-
-    def __str__(self):
-        return "movie_id: {}, box:{}".format(self.movie_id, self.box)
+    review = db.Column(db.String(2048))
 
 class ActorInfo(db.Model):
     __tablename__ = 'actor_info'
@@ -139,6 +138,8 @@ def initdb(drop):
 
     click.echo('Initialized database.')
 
+
+
 @app.cli.command()
 @click.option('--username', prompt=True, help='The username used to login.')
 @click.option('--password', prompt=True, hide_input=True, confirmation_prompt=True, help='The password used to login.')
@@ -187,13 +188,18 @@ def index():
         country = request.form.get('country')
         type = request.form.get('type')
         release_date = request.form.get('yy-mm-dd')
+        box = request.form.get('box')
+        review = generate_movie_box_office_analysis(title)
+
         # 验证数据
         if not title or not year or len(title) > 60:
             flash('Invalid input.')  # 显示错误提示
             return redirect(url_for('index'))  # 重定向回主页
         # 保存表单数据到数据库
         movie = Movie(movie_name=title, year=year, release_date=release_date, country = country, type=type)  # 创建记录
+        moviebox = MovieBox(box = box,review = review)
         db.session.add(movie)  # 添加到数据库会话
+        db.session.add(moviebox)
         db.session.commit()  # 提交数据库会话
         flash('Item created.')  # 显示成功创建的提示
         return redirect(url_for('index'))  # 重定向回主页
@@ -206,7 +212,7 @@ def view_movie(movie_id):
     movie = Movie.query.get(movie_id)
     # 假设 BoxOffice 表与 Movie 表使用外键关联，并且票房信息存储在该表中
     box_office_info = MovieBox.query.filter_by(movie_id=movie_id).first()
-    print(box_office_info)
+    #print(box_office_info)
 
     # 假设 Cast 表与 Movie 表使用外键关联，并且主演信息存储在该表中
     cast_info = MovieActorRelation.query.filter_by(movie_id=movie_id, relation_type="主演").all()
@@ -219,6 +225,7 @@ def view_movie(movie_id):
         director.actor_name = "无"
     actor_ids = [cast.actor_id for cast in cast_info]
     actors = [ActorInfo.query.filter_by(actor_id=actor_id).first() for actor_id in actor_ids]
+    review = MovieBox.query.filter_by(movie_id=movie_id).first()
     if not actors:
         actors = [ActorInfo()]
         actors[0].actor_name = "无"

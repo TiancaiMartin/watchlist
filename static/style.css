@@ -17,6 +17,28 @@ padding: 10px;
 width: 35px;
 }
 
+.form-container {
+    display: flex;
+    flex-direction: column;
+    width: 200px; /* 调整表单容器的宽度 */
+    margin: 20px auto; /* 设置表单容器居中 */
+}
+
+.btn {
+    padding: 8px 15px;
+    margin-bottom: 10px;
+    background-color: #007bff; /* 按钮背景颜色 */
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.input-label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
 /* 覆盖某些浏览器对 input 元素定义的字体 */
 input[type=submit] {
 font-family: inherit;
