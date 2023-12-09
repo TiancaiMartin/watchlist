@@ -306,12 +306,12 @@ def logout():
 @login_required
 def settings():
     if request.method == 'POST':
-        name = request.form['name']
-        if not name or len(name) > 20:
+        username = request.form.get('name')
+        if not username or len(username) > 20:
             flash('Invalid input.')
             return redirect(url_for('settings'))
 
-        current_user.name = name  # 更新当前登录用户的名称
+        current_user.username = username  # 更新当前登录用户的名称
         db.session.commit()
         flash('Settings updated.')
 
