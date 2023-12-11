@@ -86,9 +86,6 @@ class MovieActorRelation(db.Model):
     movie = db.relationship('Movie', backref='movie_actors')
     actor = db.relationship('ActorInfo', backref='actor_movies')
 
-
-
-
 @app.context_processor
 def inject_user():
     return {'user': current_user}
