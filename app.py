@@ -12,6 +12,7 @@ from flask_sqlalchemy import SQLAlchemy  # 导入扩展类
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.orm.session import make_transient
 from request_gpt import generate_movie_box_office_analysis
+from sqlalchemy import desc
 
 WIN = sys.platform.startswith('win')
 if WIN:
@@ -176,11 +177,25 @@ def bad_request(e):
 def internal_server_error(e):
     return render_template('500.html'), 500
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def index():
-    if request.method == 'POST':  # 判断是否是 POST 请求
-        if not current_user.is_authenticated:  # 如果当前用户未认证
-            return redirect(url_for('index'))  # 重定向到主页
+    year_filter = request.args.get('year')
+    page = request.args.get('page', 1, type=int)  # 获取页码，默认为第一页
+
+    movies = Movie.query
+
+    if year_filter:
+        movies = movies.filter(Movie.year == year_filter)  # 使用 filter 方法进行筛选
+
+    movies_pagination = movies.paginate(page=page, per_page=10)
+    return render_template('index.html', movies=movies_pagination, year_filter=year_filter)
+
+@app.route('/add_movie', methods=['GET', 'POST'])
+@login_required
+def add_movie():
+    if request.method == 'GET':
+        return render_template('add_movie.html')
+    elif request.method == 'POST':
         # 获取表单数据
         title = request.form.get('movie_name')
         # 传入表单对应输入字段的name值
@@ -195,16 +210,14 @@ def index():
         if not title or not year or len(title) > 60:
             flash('Invalid input.')  # 显示错误提示
             return redirect(url_for('index'))  # 重定向回主页
-        # 保存表单数据到数据库
-        movie = Movie(movie_name=title, year=year, release_date=release_date, country = country, type=type)  # 创建记录
-        moviebox = MovieBox(box = box,review = review)
+
+        movie = Movie(movie_name=title, year=year, release_date=release_date, country=country, type=type)  # 创建记录
+        moviebox = MovieBox(box=box, review=review)
         db.session.add(movie)  # 添加到数据库会话
         db.session.add(moviebox)
-        db.session.commit()  # 提交数据库会话
-        flash('Item created.')  # 显示成功创建的提示
-        return redirect(url_for('index'))  # 重定向回主页
-    movies = Movie.query.all()
-    return render_template('index.html', movies=movies)
+        db.session.commit()
+        flash('Movie added successfully.')
+        return redirect(url_for('index'))  # 添加完成后重定向回主页
 
 @app.route('/movie/view_movie/<int:movie_id>')
 def view_movie(movie_id):
@@ -225,7 +238,6 @@ def view_movie(movie_id):
         director.actor_name = "无"
     actor_ids = [cast.actor_id for cast in cast_info]
     actors = [ActorInfo.query.filter_by(actor_id=actor_id).first() for actor_id in actor_ids]
-    review = MovieBox.query.filter_by(movie_id=movie_id).first()
     if not actors:
         actors = [ActorInfo()]
         actors[0].actor_name = "无"

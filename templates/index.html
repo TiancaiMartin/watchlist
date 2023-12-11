@@ -1,6 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
-    <p>{{ movies|length }} Titles</p>
+    <!-- 添加筛选表单 -->
+    <form class="filter-form" method="get" action="{{ url_for('index') }}">
+        <label for="year">Filter by Year:</label>
+        <input type="text" name="year" id="year" placeholder="Enter year" value="{{ year_filter }}">
+        <button type="submit">Apply</button>
+    </form>
+
+    <p>{{ movies.total }} Titles</p>
     <ul class="movie-list">
         {% for movie in movies %}
             <li>
@@ -18,24 +25,23 @@
             </li>
         {% endfor %}
     </ul>
-    {% if current_user.is_authenticated %}
-        <form method="post">
-            <div class="form-container">
-                <input class="btn" type="submit" name="submit" value="Add">
-                <label class="input-label">Movie Name</label>
-                <input class="inline-form" type="text" name="movie_name" autocomplete="off" required>
-                <label class="input-label">Year</label>
-                <input class="inline-form" type="text" name="year" autocomplete="off" required>
-                <label class="input-label">Country</label>
-                <input class="inline-form" type="text" name="country" autocomplete="off" required>
-                <label class="input-label">Type</label>
-                <input class="inline-form" type="text" name="type" autocomplete="off" required>
-                <label class="input-label">Release Date (YY-MM-DD)</label>
-                <input class="inline-form" type="text" name="yy-mm-dd" autocomplete="off" required>
-                <label class="input-label">Box</label>
-                <input class="inline-form" type="text" name="box" autocomplete="off" required>
-            </div>
-        </form>
+    
+    <!-- 翻页链接 -->
+<div class="pagination">
+    {% if movies.has_prev %}
+        <a href="{{ url_for('index', year=year_filter, page=movies.prev_num) }}">Previous</a>
+    {% else %}
+        <span>Previous</span>
     {% endif %}
+
+    <span>Page {{ movies.page }} of {{ movies.pages }}</span>
+
+    {% if movies.has_next %}
+        <a href="{{ url_for('index', year=year_filter, page=movies.next_num) }}">Next</a>
+    {% else %}
+        <span>Next</span>
+    {% endif %}
+</div>
+
     <img alt="Bruh Cat" class="bruh" src="{{ url_for('static', filename='images/bruh.gif') }}" title="Bruh~">
 {% endblock %}
